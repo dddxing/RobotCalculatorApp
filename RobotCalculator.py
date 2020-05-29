@@ -3,6 +3,7 @@ from tkinter import messagebox
 from db import Database
 from PIL import ImageTk, Image
 import os
+import Calculation
 
 # Instanciate databse object
 db = Database('store.db')
@@ -14,7 +15,7 @@ class Application(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.master = master
-        master.title('Robot Calculator')
+        master.title('Robot Calculator - Beta (Stanley Black & Decker CoE)')
         # Width height
         master.geometry("700x400")
         # Create widgets/grid
@@ -88,7 +89,7 @@ class Application(tk.Frame):
         self.exit_btn.grid(row=2, column=3)
 
         self.calc_btn = tk.Button(
-            self.master, text="Calculate", width=12, command=self.clear_text)
+            self.master, text="Calculate", width=12, command=self.display_result)        
         self.calc_btn.grid(row=3, column=4)
 
     def populate_list(self):
@@ -102,8 +103,7 @@ class Application(tk.Frame):
     # Add new item
     def add_item(self):
         if self.from_text.get() == '' or self.to_list.get() == '' or self.ProductionRate.get() == '' or self.Distance_text.get() == '':
-            messagebox.showerror(
-                "Required Fields", "Please include all fields")
+            messagebox.showerror("Required Fields", "Please include all fields")
             return
         print(self.from_text.get())
         # Insert into DB
@@ -159,7 +159,11 @@ class Application(tk.Frame):
         self.ProductionRate_entry.delete(0, tk.END)
         self.Distance_entry.delete(0, tk.END)
 
+    def display_result(self):
+        Calculation.calculate()
+        tk.messagebox.showinfo(title='Result', message=f"You will need {Calculation.display_result()} to accommodate your request. To round up, you will need {Calculation.display_result_ru()}")
 
+    
 root = tk.Tk()
 # img = ImageTk.PhotoImage(Image.open("Stanley_Black_&_Decker_logo.png"))
 # panel = tk.Label(root, image = img)
