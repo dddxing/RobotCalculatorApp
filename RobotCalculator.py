@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 from db import Database
-from PIL import ImageTk, Image
+from PIL import Image, ImageTk
 import os
 import Calculation
 
@@ -10,60 +11,72 @@ db = Database('store.db')
 
 # Main Application/GUI class
 
-
 class Application(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.master = master
-        master.title('Robot Calculator - Beta (Stanley Black & Decker CoE)')
+        master.title('AMR Calculator - Beta (Stanley Black & Decker CoE)')
+        
         # Width height
-        master.geometry("700x400")
+        master.geometry("850x400")
+        master.resizable(False, False)
+        
         # Create widgets/grid
         self.create_widgets()
+        
         # Init selected item var
         self.selected_item = 0
+        
         # Populate initial list
         self.populate_list()
+        master.iconbitmap(self, default="SquareLogo.ico")
+
+        self.add_logo()
+
+    def add_logo(self):
+        pic_name = "Stanley_Black_&_Decker_logo.png"
+        load = Image.open(pic_name)
+        render = ImageTk.PhotoImage(load)
+        img = tk.Label(self, image=render)
+        img.image = render
+        img.place(x=0, y=0)
 
     def create_widgets(self):
         # From Input
+        self.title = tk.StringVar()
+        self.title = tk.Label(self.master, text='CoE AMR Calculator', font=('Calibri Bold', 20), pady=20)
+        self.title.grid(row=0, column=2)
+
         self.from_text = tk.StringVar()
-        self.from_label = tk.Label(
-            self.master, text='From', font=('bold', 14), pady=20)
-        self.from_label.grid(row=0, column=0, sticky=tk.W)
+        self.from_label = tk.Label(self.master, text='From', font=('Calibri', 12), pady=20)
+        self.from_label.grid(row=1, column=0, sticky=tk.E)
         self.from_entry = tk.Entry(self.master, textvariable=self.from_text)
-        self.from_entry.grid(row=0, column=1)
+        self.from_entry.grid(row=1, column=1)
         # To Input
         self.to_list = tk.StringVar()
-        self.to_label = tk.Label(
-            self.master, text='To', font=('bold', 14))
-        self.to_label.grid(row=0, column=2, sticky=tk.W)
-        self.to_entry = tk.Entry(
-            self.master, textvariable=self.to_list)
-        self.to_entry.grid(row=0, column=3)
+        self.to_label = tk.Label(self.master, text='To', font=('Calibri', 12))
+        self.to_label.grid(row=1, column=2, sticky=tk.E)
+        self.to_entry = tk.Entry(self.master, textvariable=self.to_list)
+        self.to_entry.grid(row=1, column=3)
         # ProductionRate
         self.ProductionRate = tk.StringVar()
-        self.ProductionRate_label = tk.Label(
-            self.master, text='Production Rate', font=('bold', 14))
-        self.ProductionRate_label.grid(row=1, column=0, sticky=tk.W)
-        self.ProductionRate_entry = tk.Entry(
-            self.master, textvariable=self.ProductionRate)
-        self.ProductionRate_entry.grid(row=1, column=1)
+        self.ProductionRate_label = tk.Label(self.master, text="Production Rate (Piece/Hour)", font=('Calibri', 12))
+        self.ProductionRate_label.grid(row=2, column=0, sticky=tk.E)
+        self.ProductionRate_entry = tk.Entry(self.master, textvariable=self.ProductionRate)
+        self.ProductionRate_entry.grid(row=2, column=1)
         # Distance
         self.Distance_text = tk.StringVar()
-        self.Distance_label = tk.Label(
-            self.master, text="Distance in 'm'", font=('bold', 14))
-        self.Distance_label.grid(row=1, column=2, sticky=tk.W)
+        self.Distance_label = tk.Label(self.master, text="Distance (ft)", font=('Calibri', 12))
+        self.Distance_label.grid(row=2, column=2, sticky=tk.E)
         self.Distance_entry = tk.Entry(self.master, textvariable=self.Distance_text)
-        self.Distance_entry.grid(row=1, column=3)
+        self.Distance_entry.grid(row=2, column=3)
 
         # From to list (listbox)
-        self.from_to_list = tk.Listbox(self.master, height=8, width=50, border=0)
-        self.from_to_list.grid(row=3, column=0, columnspan=3,
-                             rowspan=6, pady=20, padx=20)
+        self.from_to_list = tk.Listbox(self.master, height=8, width=30, border=1)
+        self.from_to_list.grid(row=4, column=0, columnspan=3, rowspan=6, pady=20, padx=20)
         # Create scrollbar
         self.scrollbar = tk.Scrollbar(self.master)
-        self.scrollbar.grid(row=3, column=3)
+        self.scrollbar.grid(row=4, column=2)
         # Set scrollbar to Trips
         self.from_to_list.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.configure(command=self.from_to_list.yview)
@@ -72,25 +85,26 @@ class Application(tk.Frame):
         self.from_to_list.bind('<<ListboxSelect>>', self.select_item)
 
         # Buttons
-        self.add_btn = tk.Button(
-            self.master, text="Add Trip", width=12, command=self.add_item)
-        self.add_btn.grid(row=2, column=0, pady=20)
+        self.add_btn = ttk.Button(self.master, text="Add Trip", width=12, command=self.add_item)
+        self.add_btn.grid(row=3, column=0, pady=20)
 
-        self.remove_btn = tk.Button(
-            self.master, text="Remove Trip", width=12, command=self.remove_item)
-        self.remove_btn.grid(row=2, column=1)
+        self.remove_btn = ttk.Button(self.master, text="Remove Trip", width=12, command=self.remove_item)
+        self.remove_btn.grid(row=3, column=1)
 
-        self.update_btn = tk.Button(
-            self.master, text="Update Trip", width=12, command=self.update_item)
-        self.update_btn.grid(row=2, column=2)
+        self.update_btn = ttk.Button(self.master, text="Update Trip", width=12, command=self.update_item)
+        self.update_btn.grid(row=3, column=2)
 
-        self.exit_btn = tk.Button(
-            self.master, text="Clear Input", width=12, command=self.clear_text)
-        self.exit_btn.grid(row=2, column=3)
+        self.exit_btn = ttk.Button(self.master, text="Clear Input", width=12, command=self.clear_text)
+        self.exit_btn.grid(row=3, column=3)
 
-        self.calc_btn = tk.Button(
-            self.master, text="Calculate", width=12, command=self.display_result)        
-        self.calc_btn.grid(row=3, column=4)
+        self.calc_btn = ttk.Button(self.master, text="Calculate", width=12, command=self.display_result)        
+        self.calc_btn.grid(row=4, column=4)
+
+        # Addin contribution
+        self.contributor = tk.StringVar()
+        self.contributor_label = tk.Label(self.master, text='Created by Daming Xing\n Stanley Black & Decker CoE', font=('Calibri Light', 8), pady=20)
+        self.contributor_label.grid(row=5, column=4, pady=20, padx=20)
+
 
     def populate_list(self):
         # Delete items before update. So when you keep pressing it doesnt keep getting (show example by calling this twice)
@@ -107,13 +121,11 @@ class Application(tk.Frame):
             return
         print(self.from_text.get())
         # Insert into DB
-        db.insert(self.from_text.get(), self.to_list.get(),
-                  self.ProductionRate.get(), self.Distance_text.get())
+        db.insert(self.from_text.get(), self.to_list.get(),self.ProductionRate.get(), self.Distance_text.get())
         # Clear list
         self.from_to_list.delete(0, tk.END)
         # Insert into list
-        self.from_to_list.insert(tk.END, (self.from_text.get(), self.to_list.get(
-        ), self.ProductionRate.get(), self.Distance_text.get()))
+        self.from_to_list.insert(tk.END, (self.from_text.get(), self.to_list.get(), self.ProductionRate.get(), self.Distance_text.get()))
         self.clear_text()
         self.populate_list()
 
@@ -148,8 +160,7 @@ class Application(tk.Frame):
 
     # Update item
     def update_item(self):
-        db.update(self.selected_item[0], self.from_text.get(
-        ), self.to_list.get(), self.ProductionRate.get(), self.Distance_text.get())
+        db.update(self.selected_item[0], self.from_text.get(), self.to_list.get(), self.ProductionRate.get(), self.Distance_text.get())
         self.populate_list()
 
     # Clear all text fields
@@ -165,6 +176,7 @@ class Application(tk.Frame):
 
     
 root = tk.Tk()
+
 # img = ImageTk.PhotoImage(Image.open("Stanley_Black_&_Decker_logo.png"))
 # panel = tk.Label(root, image = img)
 # panel.pack(side = "bottom", fill = "both", expand = "yes")
