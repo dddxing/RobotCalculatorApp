@@ -1,6 +1,6 @@
 # RobotCalculatorApp
 
-I created this desktop application with tkinter framework to calculate the number of mobile robots needed to accommodate the current demands.
+I created this GUI application and algorithms to calculate the number of Automomous Mobile Robots required in a flexible manufacturing systems.
 
 <img src="Example.JPG"/>
 
